@@ -1,0 +1,1 @@
+Простоя реализации алгоритма из статьи "The Algorithm That Maximizes the Accuracy of k-Classification on the Set of Representatives of the k Equivalence Classes" [$\rightarrow$ https://www.mdpi.com/2227-7390/10/15/2810].
