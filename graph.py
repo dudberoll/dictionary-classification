@@ -1,3 +1,5 @@
+import networkx as nx
+import matplotlib.pyplot as plt
 
 def clique(graph: dict):
 
@@ -30,8 +32,8 @@ def BronKerbosch(R: set, P: set, X:set, graph:dict, clique:list) -> list:
     X ⋃ {v} := соединение множества X и единичного набора v.
     """
     for v in list(P):
-        if clique:
-            return
+        # if clique:
+        #     return
 
         N_v = graph.get(v, set())    
         BronKerbosch(
@@ -43,31 +45,11 @@ def BronKerbosch(R: set, P: set, X:set, graph:dict, clique:list) -> list:
         )
         P.remove(v)
         X.add(v)
-    
-# treshhold 0.8
-my_graph = {'break': {'go', 'left', 'left_hand', 'start'},
- 'go': {'break', 'left', 'left_hand', 'stop'},
- 'left': {'break', 'go', 'start', 'stop'},
- 'left_hand': {'break', 'go', 'start', 'stop'},
- 'start': {'break', 'left', 'left_hand', 'stop'},
- 'stop': {'go', 'left', 'left_hand', 'start'}
- }
-
-my_graph_2 = {
-    1: {2, 3, 4},
-    2: {1, 3, 4},
-    3: {1, 2, 4, 5},
-    4: {1, 2, 3, 5},
-    5: {3, 4, 6},
-    6: {5}
-}
-print("dsf", clique(my_graph))
-
 
 
 def format_algo_graph_(edge_weights):
     """
-    Создает граф на основе весов ребер.
+    Форматирует граф для алгоритма 
 
     Args:
         edge_weights: Словарь, ключи - веса
@@ -95,3 +77,57 @@ def format_algo_graph_(edge_weights):
         my_graph[node2_label].add(node1_label) # в две стороны ребра
 
     return my_graph
+
+def create_graph(classification_scores: dict) -> nx.Graph:
+    """
+    Создаёт граф networkx из значений точности классификации между парами классов.
+
+    Args:
+        classification_scores: Словарь ключи — кортежи пар слов,
+                               значения —  метрики классификации.
+
+    Returns:
+        G: Созданный граф networkx.
+    """
+    G = nx.Graph()
+    for e, score in classification_scores.items():
+        G.add_edge(e[0], e[1], weight=score)
+    return G
+def visualize_graph(graph: nx.Graph) -> None:
+    """
+    Визуализирует граф networkx пар слов и их метрик классификации.
+
+    Args:
+        graph: граф networkx
+    """
+    plt.figure(figsize=(10, 8)) 
+    pos = nx.spring_layout(graph) 
+    nx.draw(graph, pos, with_labels=True, node_color='lightblue', node_size=1000, font_size=10, font_weight='bold')
+    edge_labels = nx.get_edge_attributes(graph, 'weight')
+    nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels)
+    plt.show()
+
+def filter_dict_by_weight_threshold(input_dict, threshold):
+
+    filtered = {}
+    for edge, weight in input_dict.items():
+        if weight >= threshold:
+            filtered[edge] = weight
+    return filtered
+
+def find_clique(edge_weights, target_k, start_threshold=0.8, step=0.2, min_threshold=0.0):
+    """
+    Итеративно понижает порог и строит граф до тех пор, пока размер максимальной клики
+    не станет равен target_k. Возвращает"""
+    threshold = start_threshold
+    while threshold >= min_threshold:
+        filtered_edges = filter_dict_by_weight_threshold(edge_weights, threshold)
+        algo_graph = format_algo_graph_(filtered_edges)
+        cliques = clique(algo_graph)
+        max_cl = max(cliques, key=len) if cliques else set()
+        if len(max_cl) == target_k:
+            return max_cl
+        threshold -= step
+    return None
+
+ # демонстрационный код перенесён в main.py
