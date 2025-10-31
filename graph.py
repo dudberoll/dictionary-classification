@@ -11,6 +11,7 @@ def clique(graph: dict):
 
 def BronKerbosch(R: set, P: set, X:set, graph:dict, clique:list) -> list:
     """
+    Алгоритм для поиска полного подграфа (в нашем случаем первого)
     R := это множество вершин максимальной клики.
     P := множество возможных вершин максимальной клики.
     X := множество исключенных вершин.
@@ -43,13 +44,15 @@ def BronKerbosch(R: set, P: set, X:set, graph:dict, clique:list) -> list:
         P.remove(v)
         X.add(v)
     
-my_graph = {
-    1: {2, 3},
-    2: {1, 4},
-    3: {1, 4, 5},
-    4: {2, 3, 5},
-    5: {3, 4}
-}
+# treshhold 0.8
+my_graph = {'break': {'go', 'left', 'left_hand', 'start'},
+ 'go': {'break', 'left', 'left_hand', 'stop'},
+ 'left': {'break', 'go', 'start', 'stop'},
+ 'left_hand': {'break', 'go', 'start', 'stop'},
+ 'start': {'break', 'left', 'left_hand', 'stop'},
+ 'stop': {'go', 'left', 'left_hand', 'start'}
+ }
+
 my_graph_2 = {
     1: {2, 3, 4},
     2: {1, 3, 4},
@@ -59,4 +62,36 @@ my_graph_2 = {
     6: {5}
 }
 print("dsf", clique(my_graph))
-print(clique(my_graph_2))
+
+
+
+def format_algo_graph_(edge_weights):
+    """
+    Создает граф на основе весов ребер.
+
+    Args:
+        edge_weights: Словарь, ключи - веса
+        my_graph: граф в формате словаря 
+    """
+
+    all_nodes = set()
+    for edge in edge_weights.keys():
+        all_nodes.add(edge[0])
+        all_nodes.add(edge[1])
+    all_nodes = sorted(list(all_nodes))
+
+    my_graph = {}
+    for node_label in all_nodes:
+        my_graph[node_label] = set() 
+
+    # заполняем граф вершинами
+    my_graph = {}
+    for node_label in all_nodes:
+        my_graph[node_label] = set()
+
+    # заполняем граф ребрами 
+    for (node1_label, node2_label), weight in edge_weights.items():
+        my_graph[node1_label].add(node2_label)
+        my_graph[node2_label].add(node1_label) # в две стороны ребра
+
+    return my_graph
