@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.base import TransformerMixin
-from typing import Dict, List, Any, Tuple
+
 
 class SignalDataPreprocessor(TransformerMixin):
     """
@@ -152,6 +152,21 @@ def visualize_graph(graph: nx.Graph) -> None:
     nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels)
     plt.show()
 
+def filter_dict_by_weight_threshold(input_dict, threshold):
+  """
+   Фильтр словаря по порогу
+  Args:
+    input_dict: 
+    threshold:
+  """
+  filtered_dict = {}
+  for key, value in input_dict.items():
+    if value > threshold:
+      filtered_dict[key] = value
+  return filtered_dict
+
+
+
 if __name__ == "__main__":
 
     df, X, y, equivalence_classes = generate_synthetic_data()
@@ -188,6 +203,7 @@ if __name__ == "__main__":
         classification_scores[pair] = accuracy_score(y_test_filtered, y_pred)
 
     
+
     print("Точность accuracy для каждой пары")
     for pair, score in classification_scores.items():
         print(f"{pair}: accuracy: {score:.2f}")
@@ -195,3 +211,6 @@ if __name__ == "__main__":
     classification_graph = create_graph(classification_scores)
     visualize_graph(classification_graph)
 
+    
+
+    print(classification_scores)
